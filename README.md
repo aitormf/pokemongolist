@@ -73,6 +73,10 @@ La app estará disponible en **http://localhost:8080** (o el puerto configurado 
 
 ### 4. Invitar usuarios
 
+> **Nota:** El usuario `admin` (o el configurado en `ADMIN_USERNAME`) es un usuario de gestión exclusivo. **No aparece en las listas de usuarios** ni en la tabla de flags — no puede marcar Pokémon propios. Su único propósito es administrar el sistema: crear invitaciones, gestionar usuarios y actualizar fuentes de datos.
+
+
+
 1. Ve a **Admin → Invitaciones** y pulsa **Nueva invitación**
 2. Copia el link generado y compártelo
 3. El invitado abre el link, elige su nombre de usuario y contraseña
@@ -156,7 +160,7 @@ Flags disponibles: `quiero`, `tengo_100`, `tengo_shiny`
 ## Esquema de base de datos
 
 ```
-users          — id, username, password_hash, role, language
+users          — id, username, password_hash, role, language, is_system
 invites        — id, token (UUID), created_by, used_by, expires_at
 pokemon_forms  — id (templateId), pokedex_number, tipos, stats, has_shiny, ...
 user_flags     — (user_id, pokemon_form_id, flag_name) → valor

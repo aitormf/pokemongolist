@@ -36,6 +36,7 @@ def _create_admin_if_needed() -> None:
             # Sincronizar contraseña por si cambió en .env
             existing.password_hash = hash_password(password)
             existing.role = "admin"
+            existing.is_system = True
             db.commit()
             log.info("Contraseña del admin '%s' sincronizada.", username)
             return
@@ -43,6 +44,7 @@ def _create_admin_if_needed() -> None:
             username=username,
             password_hash=hash_password(password),
             role="admin",
+            is_system=True,
         )
         db.add(admin)
         db.commit()

@@ -22,6 +22,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(Text, nullable=False)
     role: Mapped[str] = mapped_column(String(16), nullable=False, default="user")
     language: Mapped[str] = mapped_column(String(32), nullable=False, default="English")
+    is_system: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

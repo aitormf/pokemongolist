@@ -22,7 +22,7 @@ def list_users(
     db: Session = Depends(get_db),
     _: User = Depends(require_admin),
 ):
-    return db.query(User).order_by(User.created_at).all()
+    return db.query(User).filter(User.is_system == False).order_by(User.created_at).all()  # noqa: E712
 
 
 @router.patch("/users/{user_id}/role")

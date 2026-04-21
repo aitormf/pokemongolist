@@ -27,7 +27,10 @@ def get_all_flags(db: Session = Depends(get_db), _: User = Depends(get_current_u
     from app.models import User as UserModel
 
     flags = db.query(UserFlag).filter(UserFlag.value == True).all()  # noqa: E712
-    users = {u.id: u.username for u in db.query(UserModel).all()}
+    users = {
+        u.id: u.username
+        for u in db.query(UserModel).filter(UserModel.is_system == False).all()  # noqa: E712
+    }
 
     result: dict[str, dict[str, dict[str, bool]]] = {}
     for f in flags:
