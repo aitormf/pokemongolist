@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pokémon GO Wishlist</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      "lit": "https://esm.sh/lit@3",
+      "lit/": "https://esm.sh/lit@3/"
+    }
+  }
+  </script>
+</head>
+<body>
+<div id="app">
+  <nav class="topbar">
+    <span class="brand">🎮 PokéWish</span>
+    <a href="#/" class="nav-link">Pokédex</a>
+    <a id="nav-admin" href="#/admin" class="nav-link" style="display:none">Admin</a>
+    <span class="user-info" id="nav-user"></span>
+    <button id="nav-logout" class="btn btn-ghost" style="display:none">Salir</button>
+  </nav>
+
+  <main id="main-content"></main>
+</div>
+
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Components -->
+<script type="module" src="/js/components/login-page.js"></script>
+<script type="module" src="/js/components/register-page.js"></script>
+<script type="module" src="/js/components/pokemon-list.js"></script>
+<script type="module" src="/js/components/pokemon-table.js"></script>
+<script type="module" src="/js/components/pokemon-card.js"></script>
+<script type="module" src="/js/components/pokemon-filters.js"></script>
+<script type="module" src="/js/components/flag-toggle.js"></script>
+<script type="module" src="/js/components/admin-panel.js"></script>
+<script type="module" src="/js/components/user-manager.js"></script>
+<script type="module" src="/js/components/invite-creator.js"></script>
+<script type="module" src="/js/components/source-updater.js"></script>
+
+<!-- Router -->
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
