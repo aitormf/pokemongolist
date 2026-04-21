@@ -31,19 +31,37 @@ async function loadUser() {
 }
 
 function updateNav() {
-  const navUser = document.getElementById("nav-user");
-  const navAdmin = document.getElementById("nav-admin");
-  const navLogout = document.getElementById("nav-logout");
+  const navUser    = document.getElementById("nav-user");
+  const navAdmin   = document.getElementById("nav-admin");
+  const navLogout  = document.getElementById("nav-logout");
+  // mobile menu mirrors
+  const menuUser   = document.getElementById("nav-menu-user");
+  const menuAdmin  = document.getElementById("nav-menu-admin");
+  const menuLogout = document.getElementById("nav-menu-logout");
 
   if (store.user) {
-    navUser.textContent = store.user.username;
-    navAdmin.style.display = store.user.role === "admin" ? "inline" : "none";
+    const isAdmin = store.user.role === "admin";
+    navUser.textContent  = store.user.username;
+    navAdmin.style.display  = isAdmin ? "inline" : "none";
     navLogout.style.display = "inline";
+
+    menuUser.textContent    = store.user.username;
+    menuAdmin.style.display  = isAdmin ? "flex" : "none";
+    menuLogout.style.display = "flex";
   } else {
-    navUser.textContent = "";
-    navAdmin.style.display = "none";
+    navUser.textContent  = "";
+    navAdmin.style.display  = "none";
     navLogout.style.display = "none";
+
+    menuUser.textContent    = "";
+    menuAdmin.style.display  = "none";
+    menuLogout.style.display = "none";
   }
+}
+
+function closeNavMenu() {
+  const menu = document.getElementById("nav-menu");
+  if (menu) menu.hidden = true;
 }
 
 async function route() {
@@ -87,12 +105,42 @@ async function route() {
   await loadUser();
   updateNav();
 
-  // Navigation handlers
+  // Desktop logout
   document.getElementById("nav-logout")?.addEventListener("click", () => {
     clearToken();
     store.user = null;
     updateNav();
     window.location.hash = "#/login";
+  });
+
+  // Mobile logout
+  document.getElementById("nav-menu-logout")?.addEventListener("click", () => {
+    closeNavMenu();
+    clearToken();
+    store.user = null;
+    updateNav();
+    window.location.hash = "#/login";
+  });
+
+  // Hamburger toggle
+  document.getElementById("nav-hamburger")?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const menu = document.getElementById("nav-menu");
+    if (menu) menu.hidden = !menu.hidden;
+  });
+
+  // Close menu on outside click
+  document.addEventListener("click", (e) => {
+    const menu = document.getElementById("nav-menu");
+    if (!menu || menu.hidden) return;
+    if (!menu.contains(e.target) && e.target.id !== "nav-hamburger") {
+      menu.hidden = true;
+    }
+  });
+
+  // Close menu on nav link click
+  document.getElementById("nav-menu")?.addEventListener("click", (e) => {
+    if (e.target.classList.contains("nav-menu-link")) closeNavMenu();
   });
 
   window.addEventListener("hashchange", async () => {

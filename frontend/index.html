@@ -18,11 +18,21 @@
 <div id="app">
   <nav class="topbar">
     <span class="brand">🎮 PokéWish</span>
-    <a href="#/" class="nav-link">Pokédex</a>
-    <a id="nav-admin" href="#/admin" class="nav-link" style="display:none">Admin</a>
-    <span class="user-info" id="nav-user"></span>
-    <button id="nav-logout" class="btn btn-ghost" style="display:none">Salir</button>
+    <!-- Desktop nav links -->
+    <a href="#/" class="nav-link nav-desktop">Pokédex</a>
+    <a id="nav-admin" href="#/admin" class="nav-link nav-desktop" style="display:none">Admin</a>
+    <span class="user-info nav-desktop" id="nav-user"></span>
+    <button id="nav-logout" class="btn btn-ghost nav-desktop" style="display:none">Salir</button>
+    <!-- Hamburger (mobile only) -->
+    <button id="nav-hamburger" class="btn btn-ghost nav-mobile" aria-label="Menú">&#9776;</button>
   </nav>
+  <!-- Mobile dropdown menu -->
+  <div id="nav-menu" class="nav-menu" hidden>
+    <a href="#/" class="nav-menu-link" id="nav-menu-pokédex">Pokédex</a>
+    <a id="nav-menu-admin" href="#/admin" class="nav-menu-link" style="display:none">Admin</a>
+    <span class="nav-menu-user" id="nav-menu-user"></span>
+    <button id="nav-menu-logout" class="btn btn-ghost nav-menu-logout" style="display:none">Salir</button>
+  </div>
 
   <main id="main-content"></main>
 </div>

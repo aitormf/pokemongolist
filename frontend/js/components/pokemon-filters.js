@@ -74,7 +74,7 @@ class PokemonFilters extends LitElement {
   render() {
     const hasFilters = this._selectedFlags.length || this._selectedUsers.length;
     return html`
-      <div class="card filters-panel">
+      <div class="filters-panel">
         <div class="filters-title">Filtros</div>
 
         <div class="filters-section">

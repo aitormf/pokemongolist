@@ -1,4 +1,5 @@
 :root {
+  --topbar-h: 56px;
   --color-bg: #1a1a2e;
   --color-surface: #16213e;
   --color-surface-2: #0f3460;
@@ -51,7 +52,7 @@ nav.topbar {
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   padding: 0 1.5rem;
-  height: 56px;
+  height: var(--topbar-h);
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -285,21 +286,87 @@ tr:hover td {
   color: var(--color-text-muted);
 }
 
-/* Filters sidebar */
+/* ── Sticky list toolbar ─────────────────────────────────────────────────── */
+.list-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0;
+  position: sticky;
+  top: var(--topbar-h);
+  z-index: 50;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.result-count {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* Botón de filtros con badge */
+.filter-toggle-btn-wrap {
+  position: relative;
+}
+
+.filter-toggle-btn {
+  white-space: nowrap;
+  gap: 0.375rem;
+}
+.filter-toggle-btn.active {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+  background: rgba(233, 69, 96, 0.1);
+}
+.filter-toggle-btn.has-badge {
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+/* Dropdown de filtros (móvil) */
+.filters-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 200;
+  min-width: 260px;
+  max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+}
+
+/* ── Filters sidebar ─────────────────────────────────────────────────────── */
 .layout-with-filters {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
-.filters-panel {
+
+.filters-sidebar {
   width: 260px;
   flex-shrink: 0;
   position: sticky;
-  top: 72px;
+  top: calc(var(--topbar-h) + 53px); /* topbar + toolbar */
 }
-.filters-panel .card {
+
+.filters-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
   padding: 1rem;
+  box-shadow: var(--shadow);
 }
+
 .filters-title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -333,13 +400,7 @@ tr:hover td {
   min-width: 0;
 }
 
-/* View toggle */
-.view-controls {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 1rem;
-}
+/* ── View toggle ─────────────────────────────────────────────────────────── */
 .view-toggle-btn {
   background: var(--color-surface-2);
   color: var(--color-text-muted);
@@ -350,11 +411,60 @@ tr:hover td {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 .view-toggle-btn.active {
   color: var(--color-primary);
   border-color: var(--color-primary);
   background: rgba(233, 69, 96, 0.1);
+}
+
+/* ── Hamburger / mobile nav ──────────────────────────────────────────────── */
+.nav-mobile  { display: none; }
+.nav-desktop { display: inline-flex; }
+
+.nav-menu {
+  position: fixed;
+  top: var(--topbar-h);
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+}
+.nav-menu[hidden] { display: none; }
+
+.nav-menu-link,
+.nav-menu-user,
+.nav-menu-logout {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  cursor: pointer;
+  font-family: inherit;
+  gap: 0.5rem;
+}
+.nav-menu-link:hover,
+.nav-menu-logout:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+.nav-menu-user {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: default;
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
 }
 
 /* Auth pages */
@@ -509,16 +619,44 @@ tr:hover td {
 .type-STEEL     { background: #b8b8d0; color: #333; }
 .type-FAIRY     { background: #ee99ac; color: #fff; }
 
-/* Responsive */
+/* ── Responsive ─────────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .layout-with-filters {
-    flex-direction: column;
+  /* Nav */
+  .nav-desktop { display: none !important; }
+  .nav-mobile  { display: inline-flex !important; }
+
+  /* main padding reducido */
+  main {
+    padding: 0.75rem;
   }
-  .filters-panel {
-    width: 100%;
-    position: static;
-  }
+
+  /* Toolbar: el label de filtros se acorta */
+  .filter-label { display: none; }
+
+  /* Sin sidebar, el content ocupa todo el ancho */
+  .desktop-only { display: none !important; }
+  .layout-with-filters { display: block; }
+
+  /* Tabla oculta siempre en móvil */
+  pokemon-table { display: none !important; }
+
+  /* Grid más compacto */
   .pokemon-grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.625rem;
+  }
+
+  /* Cards un poco más compactas */
+  .pokemon-card-item {
+    padding: 0.75rem 0.5rem;
+  }
+
+  /* Dropdown de filtros: ancho completo */
+  .filters-dropdown {
+    left: 0;
+    right: 0;
+    max-width: none;
+    min-width: 0;
+    width: calc(100vw - 1.5rem);
   }
 }
