@@ -118,6 +118,23 @@ class PokemonList extends LitElement {
     localStorage.setItem("view", v);
   }
 
+  async _exportFilter() {
+    const seen = new Set();
+    const nums = this._filteredPokemon
+      .map((p) => p.pokedex_number)
+      .filter((n) => { if (seen.has(n)) return false; seen.add(n); return true; });
+
+    if (!nums.length) return;
+
+    const filter = nums.map((n) => `#${n}`).join(",");
+    try {
+      await navigator.clipboard.writeText(filter);
+      toast("Filtro copiado al portapapeles", "success");
+    } catch {
+      toast("No se pudo acceder al portapapeles", "error");
+    }
+  }
+
   get _activeFilterCount() {
     return this._flagFilters.length + this._userFilters.length;
   }
@@ -196,9 +213,12 @@ class PokemonList extends LitElement {
           @click=${() => this._setView("grid")}
         >⊞</button>
 
-        <span class="result-count">
-          ${this._filteredPokemon.length} Pokémon
-        </span>
+        <div class="result-count-wrap">
+          <span class="result-count">${this._filteredPokemon.length} Pokémon</span>
+          ${this._filteredPokemon.length
+            ? html`<button class="btn btn-ghost export-btn" @click=${this._exportFilter}>Exportar</button>`
+            : ""}
+        </div>
       </div>
 
       <!-- Layout principal -->
