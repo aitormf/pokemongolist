@@ -187,6 +187,29 @@ El esquema ya lo soporta. Solo hace falta:
 
 No se necesitan migraciones de base de datos.
 
+### Aplicar migraciones de base de datos
+
+Cuando se actualiza la aplicación (por ejemplo tras un `git pull`) puede haber nuevas migraciones que hay que aplicar para que el esquema de la base de datos esté al día.
+
+```bash
+docker compose exec backend alembic upgrade head
+```
+
+Esto aplica todas las migraciones pendientes hasta la última versión. Es seguro ejecutarlo aunque no haya nada nuevo — si el esquema ya está actualizado, no hace nada.
+
+**¿Cuándo es necesario?** Siempre que el directorio `backend/alembic/versions/` tenga archivos nuevos respecto a la versión que tenías antes. Puedes comprobarlo con:
+
+```bash
+git log --oneline backend/alembic/versions/
+```
+
+Si quieres ver qué migraciones están pendientes sin aplicarlas:
+
+```bash
+docker compose exec backend alembic current   # revisión actual de la BD
+docker compose exec backend alembic history   # historial de migraciones
+```
+
 ### Cambiar el puerto
 
 ```bash
