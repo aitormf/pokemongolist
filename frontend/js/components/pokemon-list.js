@@ -2,6 +2,15 @@ import { LitElement, html } from "lit";
 import { api } from "../api.js";
 import { store, toast } from "../app.js";
 
+// Traducción de tipos al español para búsqueda
+const TYPE_ES = {
+  NORMAL: "normal", FIRE: "fuego", WATER: "agua", ELECTRIC: "eléctrico",
+  GRASS: "planta", ICE: "hielo", FIGHTING: "lucha", POISON: "veneno",
+  GROUND: "tierra", FLYING: "volador", PSYCHIC: "psíquico", BUG: "bicho",
+  ROCK: "roca", GHOST: "fantasma", DRAGON: "dragón", DARK: "siniestro",
+  STEEL: "acero", FAIRY: "hada",
+};
+
 /**
  * <pokemon-list>
  * Componente principal que orquesta filtros, vista tabla/grid y carga de datos.
@@ -115,12 +124,20 @@ class PokemonList extends LitElement {
 
   get _filteredPokemon() {
     if (!this._search) return this._pokemon;
-    const q = this._search.toLowerCase();
+    const raw = this._search.trim().toLowerCase();
+    // Permitir prefijo # para número de pokédex (ej: #25 → Pikachu)
+    const q = raw.startsWith("#") ? raw.slice(1) : raw;
+    const typeMatch = (type) => {
+      if (!type) return false;
+      return type.toLowerCase().includes(q) || (TYPE_ES[type] || "").includes(q);
+    };
     return this._pokemon.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
         String(p.pokedex_number).includes(q) ||
-        p.pokemon_id.toLowerCase().includes(q)
+        p.pokemon_id.toLowerCase().includes(q) ||
+        typeMatch(p.type1) ||
+        typeMatch(p.type2)
     );
   }
 
@@ -162,7 +179,7 @@ class PokemonList extends LitElement {
         <input
           type="text"
           class="search-input"
-          placeholder="Buscar Pokémon..."
+          placeholder="Nombre, tipo (fuego…) o nº pokédex…"
           .value=${this._search}
           @input=${(e) => { this._search = e.target.value; }}
         />
