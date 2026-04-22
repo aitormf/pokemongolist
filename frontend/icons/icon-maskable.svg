@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo rojo que cubre toda la zona (requerido para icono maskable) -->
+  <rect width="512" height="512" fill="#CC0000"/>
+  <!-- Pokéball escalada al 78% centrada (zona segura maskable = 80%) -->
+  <g transform="translate(256,256) scale(0.78125) translate(-256,-256)">
+    <circle cx="256" cy="256" r="256" fill="#CC0000"/>
+    <path d="M0,256 A256,256,0,0,1,512,256 Z" fill="#ffffff"/>
+    <rect x="0" y="232" width="512" height="48" fill="#1a1a1a"/>
+    <circle cx="256" cy="256" r="74" fill="#1a1a1a"/>
+    <circle cx="256" cy="256" r="52" fill="#ffffff"/>
+  </g>
+</svg>

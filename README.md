@@ -4,6 +4,7 @@ Web app para que un grupo de amigos pueda coordinar qué Pokémon quieren interc
 
 ## Características
 
+- **Instalable en Android (PWA)** — se puede añadir a la pantalla de inicio como app nativa
 - **Vista tabla y tarjetas** — alterna entre los dos modos, se recuerda la preferencia
 - **Tres flags por Pokémon y usuario** — ❤️ Quiero · 💎 100 IV · ✨ Shiny
 - **Solo editas los tuyos** — los flags de otros usuarios se muestran como solo lectura
@@ -168,6 +169,30 @@ source_versions — versión local y remota de cada fuente de datos
 ```
 
 Los flags usan un esquema flexible `(user_id, form_id, flag_name)` — añadir un nuevo tipo de flag no requiere cambios en la base de datos.
+
+## Instalación en Android (PWA)
+
+La app está preparada como Progressive Web App. Para instalarla en Android:
+
+1. Abre la app en **Chrome** (debe estar servida por HTTPS en producción, o en `localhost` en desarrollo)
+2. Chrome mostrará automáticamente un banner de **"Añadir a pantalla de inicio"**, o puedes hacerlo manualmente:
+   - Pulsa el menú ⋮ → **Añadir a pantalla de inicio** (o "Instalar app")
+3. La app se instala como una aplicación independiente sin barra de navegador
+
+> En desarrollo con `docker compose` sobre `localhost`, Chrome también muestra el prompt de instalación.
+
+### ¿Cómo funciona offline?
+
+El Service Worker precarga el app shell (HTML, CSS, JS) para que la interfaz cargue aunque no haya red. Las llamadas a la API siempre requieren conexión — sin ella la app carga pero no puede obtener datos frescos.
+
+### Actualizar la versión instalada
+
+Cuando se despliega una nueva versión, el Service Worker se actualiza automáticamente en la próxima visita. Si quieres forzar la actualización inmediata:
+
+1. En Chrome Android: Menú ⋮ → **Actualizar**
+2. O bien cierra y vuelve a abrir la app
+
+Para los desarrolladores: al cambiar el app shell, incrementar `CACHE_VERSION` en `frontend/sw.js` fuerza la invalidación del caché en todos los clientes.
 
 ## Operaciones comunes
 

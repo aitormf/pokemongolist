@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Pokéball — mitad superior roja -->
+  <circle cx="256" cy="256" r="256" fill="#CC0000"/>
+  <!-- Mitad inferior blanca -->
+  <path d="M0,256 A256,256,0,0,1,512,256 Z" fill="#ffffff"/>
+  <!-- Banda central oscura -->
+  <rect x="0" y="232" width="512" height="48" fill="#1a1a1a"/>
+  <!-- Botón central (aro oscuro + interior blanco) -->
+  <circle cx="256" cy="256" r="74" fill="#1a1a1a"/>
+  <circle cx="256" cy="256" r="52" fill="#ffffff"/>
+</svg>

@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pokémon GO Wishlist</title>
+  <title>PokéWish</title>
+  <meta name="theme-color" content="#e94560" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PokéWish" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icons/icon.svg" />
   <link rel="stylesheet" href="/css/main.css" />
   <script type="importmap">
   {
@@ -54,5 +62,14 @@
 
 <!-- Router -->
 <script type="module" src="/js/app.js"></script>
+
+<!-- Registro del Service Worker (PWA) -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.warn('Service Worker no registrado:', err);
+    });
+  }
+</script>
 </body>
 </html>
