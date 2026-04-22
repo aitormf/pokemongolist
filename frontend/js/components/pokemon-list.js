@@ -126,7 +126,7 @@ class PokemonList extends LitElement {
 
     if (!nums.length) return;
 
-    const filter = nums.map((n) => `#${n}`).join(",");
+    const filter = nums.join(",");
     try {
       await navigator.clipboard.writeText(filter);
       toast("Filtro copiado al portapapeles", "success");
