@@ -6,8 +6,8 @@ from sqlalchemy.orm import Session
 from app.auth import require_admin, get_current_user
 from app.config import settings
 from app.db import get_db
-from app.models import User, Invite, SourceVersion
-from app.schemas import UserOut, InviteOut, SourceStatusOut
+from app.models import User, Invite, SourceVersion, PasswordResetToken
+from app.schemas import UserOut, InviteOut, SourceStatusOut, PasswordResetOut
 from app.services import game_master as gm_service
 from app.services import translations as tr_service
 from app.services import assets as as_service
@@ -59,6 +59,34 @@ def delete_user(
     db.delete(user)
     db.commit()
     return {"deleted": True}
+
+
+# ── Reset de contraseña ───────────────────────────────────────────────────────
+
+@router.post("/users/{user_id}/reset-token", response_model=PasswordResetOut)
+def create_reset_token(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    # Invalida tokens anteriores no usados para este usuario
+    db.query(PasswordResetToken).filter(
+        PasswordResetToken.user_id == user_id,
+        PasswordResetToken.used_at == None,  # noqa: E711
+    ).delete()
+    expires = datetime.now(timezone.utc) + timedelta(hours=settings.reset_token_expire_hours)
+    reset_token = PasswordResetToken(
+        user_id=user_id,
+        created_by=current_user.id,
+        expires_at=expires,
+    )
+    db.add(reset_token)
+    db.commit()
+    db.refresh(reset_token)
+    return reset_token
 
 
 # ── Invitaciones ──────────────────────────────────────────────────────────────

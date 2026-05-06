@@ -10,8 +10,8 @@ from app.auth import (
     get_current_user,
 )
 from app.db import get_db
-from app.models import User, Invite
-from app.schemas import RegisterRequest, LoginRequest, TokenResponse, UserOut
+from app.models import User, Invite, PasswordResetToken
+from app.schemas import RegisterRequest, LoginRequest, TokenResponse, UserOut, ResetPasswordRequest
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -59,6 +59,27 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserOut)
 def me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/reset-password")
+def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+    reset_token = db.query(PasswordResetToken).filter(
+        PasswordResetToken.token == body.token
+    ).first()
+    if not reset_token:
+        raise HTTPException(status_code=400, detail="Enlace no válido")
+    if reset_token.used_at is not None:
+        raise HTTPException(status_code=400, detail="Este enlace ya fue usado")
+    now = datetime.now(timezone.utc)
+    if reset_token.expires_at < now:
+        raise HTTPException(status_code=400, detail="Este enlace ha expirado")
+    user = db.get(User, reset_token.user_id)
+    if not user:
+        raise HTTPException(status_code=400, detail="Usuario no encontrado")
+    user.password_hash = hash_password(body.new_password)
+    reset_token.used_at = now
+    db.commit()
+    return {"ok": True}
 
 
 @router.patch("/me/language")

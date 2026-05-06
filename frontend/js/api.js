@@ -78,6 +78,9 @@ export const api = {
   changeRole: (userId, role) =>
     request("PATCH", `/admin/users/${userId}/role`, { role }),
   deleteUser: (userId) => request("DELETE", `/admin/users/${userId}`),
+  generateResetToken: (userId) => request("POST", `/admin/users/${userId}/reset-token`),
+  resetPassword: (token, newPassword) =>
+    request("POST", "/auth/reset-password", { token, new_password: newPassword }),
   listInvites: () => request("GET", "/admin/invites"),
   createInvite: () => request("POST", "/admin/invites"),
   deleteInvite: (inviteId) => request("DELETE", `/admin/invites/${inviteId}`),

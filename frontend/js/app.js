@@ -80,6 +80,12 @@ async function route() {
     main.innerHTML = `<register-page data-token="${token}"></register-page>`;
     return;
   }
+  if (hash.startsWith("#/reset-password")) {
+    const hashParams = new URLSearchParams(hash.split("?")[1] ?? "");
+    const token = hashParams.get("token") ?? "";
+    main.innerHTML = `<reset-password-page data-token="${token}"></reset-password-page>`;
+    return;
+  }
 
   // Require auth for everything else
   if (!store.user) {

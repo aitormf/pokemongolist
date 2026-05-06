@@ -47,6 +47,25 @@ class UserOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class PasswordResetOut(BaseModel):
+    token: str
+    expires_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_valid(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("La contraseña debe tener al menos 6 caracteres")
+        return v
+
+
 class InviteOut(BaseModel):
     id: int
     token: str

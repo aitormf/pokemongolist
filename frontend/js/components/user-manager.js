@@ -6,6 +6,7 @@ class UserManager extends LitElement {
   static properties = {
     _users: { type: Array, state: true },
     _loading: { type: Boolean, state: true },
+    _resetLink: { type: String, state: true },
   };
 
   createRenderRoot() { return this; }
@@ -14,6 +15,7 @@ class UserManager extends LitElement {
     super();
     this._users = [];
     this._loading = true;
+    this._resetLink = "";
   }
 
   async connectedCallback() {
@@ -44,6 +46,22 @@ class UserManager extends LitElement {
     }
   }
 
+  async _generateResetLink(user) {
+    try {
+      const data = await api.generateResetToken(user.id);
+      const base = `${window.location.origin}${window.location.pathname}`;
+      this._resetLink = `${base}#/reset-password?token=${data.token}`;
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  }
+
+  _copyResetLink() {
+    navigator.clipboard.writeText(this._resetLink).then(() => {
+      toast("Link copiado al portapapeles");
+    });
+  }
+
   async _delete(user) {
     if (!confirm(`¿Eliminar usuario "${user.username}"? Esta acción no se puede deshacer.`)) return;
     try {
@@ -60,6 +78,22 @@ class UserManager extends LitElement {
 
     return html`
       <div>
+        ${this._resetLink ? html`
+          <div class="card" style="margin-bottom:1rem;padding:1rem;border:1px solid var(--color-border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+              <span style="font-size:0.85rem;font-weight:600">Link de reseteo generado (válido 24h)</span>
+              <button class="btn btn-ghost" style="font-size:0.75rem;padding:0.2rem 0.4rem"
+                @click=${() => { this._resetLink = ""; }}>✕</button>
+            </div>
+            <div style="display:flex;gap:0.5rem;align-items:center">
+              <input type="text" readonly .value=${this._resetLink}
+                style="flex:1;font-size:0.75rem;padding:0.4rem 0.5rem;background:var(--color-bg-alt);border:1px solid var(--color-border);border-radius:6px;color:var(--color-text)"
+                @click=${(e) => e.target.select()} />
+              <button class="btn btn-primary" style="font-size:0.75rem;padding:0.4rem 0.75rem;white-space:nowrap"
+                @click=${this._copyResetLink}>Copiar</button>
+            </div>
+          </div>
+        ` : ""}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
           <h3 style="font-size:1rem">Usuarios (${this._users.length})</h3>
         </div>
@@ -94,10 +128,14 @@ class UserManager extends LitElement {
                   <td style="color:var(--color-text-muted);font-size:0.8rem">${u.language}</td>
                   <td>
                     ${u.id !== store.user?.id ? html`
-                      <div style="display:flex;gap:0.5rem">
+                      <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
                         <button class="btn btn-ghost" style="font-size:0.75rem;padding:0.25rem 0.5rem"
                           @click=${() => this._changeRole(u)}>
                           ${u.role === "admin" ? "→ user" : "→ admin"}
+                        </button>
+                        <button class="btn btn-ghost" style="font-size:0.75rem;padding:0.25rem 0.5rem"
+                          @click=${() => this._generateResetLink(u)}>
+                          Reset pwd
                         </button>
                         <button class="btn btn-danger" style="font-size:0.75rem;padding:0.25rem 0.5rem"
                           @click=${() => this._delete(u)}>
