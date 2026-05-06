@@ -8,6 +8,8 @@ from app.schemas.schemas import (
     FlagOut,
     AllFlagsOut,
     SourceStatusOut,
+    PasswordResetOut,
+    ResetPasswordRequest,
 )
 
 __all__ = [
@@ -20,4 +22,6 @@ __all__ = [
     "FlagOut",
     "AllFlagsOut",
     "SourceStatusOut",
+    "PasswordResetOut",
+    "ResetPasswordRequest",
 ]
