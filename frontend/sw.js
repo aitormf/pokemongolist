@@ -10,7 +10,7 @@
  * del caché en todos los clientes.
  */
 
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = `pokewish-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -21,6 +21,7 @@ const APP_SHELL = [
   '/js/app.js',
   '/js/components/login-page.js',
   '/js/components/register-page.js',
+  '/js/components/reset-password-page.js',
   '/js/components/pokemon-list.js',
   '/js/components/pokemon-table.js',
   '/js/components/pokemon-card.js',
@@ -58,6 +59,9 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const { request } = e;
   const url = new URL(request.url);
+
+  // Ignorar esquemas que no sean http/https (chrome-extension, etc.)
+  if (!url.protocol.startsWith('http')) return;
 
   // API: siempre red — los datos deben ser frescos
   if (url.pathname.startsWith('/api/')) {
