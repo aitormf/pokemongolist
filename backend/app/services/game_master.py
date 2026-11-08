@@ -30,6 +30,10 @@ ENTRY_PATTERN = re.compile(r"^V(\d{4})_POKEMON_(.+)$")
 # Tipos que no son formas jugables (mega, shadow, purified se filtran aparte)
 SKIP_SUFFIXES = {"_REVERSION", "_NORMAL"}
 
+# Por debajo de este número de formas asumimos que la descarga es incorrecta
+# y no se eliminan formas obsoletas (hoy hay ~1500)
+MIN_EXPECTED_FORMS = 1000
+
 
 def _clean_type(raw: str | None) -> str | None:
     if not raw:
@@ -48,7 +52,7 @@ def _costume_forms(entries: list[dict]) -> set[str]:
     return costumes
 
 
-def _parse_entry(entry: dict) -> dict | None:
+def _parse_entry(entry: dict, costumes: set[str]) -> dict | None:
     template_id = entry.get("templateId", "")
     m = ENTRY_PATTERN.match(template_id)
     if not m:
@@ -67,6 +71,15 @@ def _parse_entry(entry: dict) -> dict | None:
 
     if not pokemon_id:
         return None
+
+    # Se comprueba con la forma original, que es como aparece en formSettings
+    is_costume = form in costumes
+
+    # Formas recién añadidas llegan con un id numérico provisional (p. ej. 3362)
+    # que luego cambia. Usamos el nombre del templateId (ZUBAT_HALLOWEEN_2026_01),
+    # que es estable y coincide con el nombre de los assets.
+    if form is not None and form.isdigit():
+        form = m.group(2)
 
     # La id de la forma: si hay form explícito usarlo, si no usar pokemonId
     form_id = form if form else pokemon_id
@@ -90,6 +103,7 @@ def _parse_entry(entry: dict) -> dict | None:
         "quick_moves": settings_raw.get("quickMoves"),
         "cinematic_moves": settings_raw.get("cinematicMoves"),
         "elite_cinematic_move": settings_raw.get("eliteCinematicMove"),
+        "is_costume": is_costume,
     }
 
 
@@ -113,15 +127,31 @@ async def update_game_master(db: Session) -> dict:
         raw = r.json()
 
     entries = raw if isinstance(raw, list) else raw.get("template", [])
-    parsed = [p for e in entries if (p := _parse_entry(e)) is not None]
     costumes = _costume_forms(entries)
-    for p in parsed:
-        p["is_costume"] = p["form"] in costumes
+    parsed = [p for e in entries if (p := _parse_entry(e, costumes)) is not None]
 
     log.info("Parseadas %d formas de Pokémon", len(parsed))
 
     now = datetime.now(timezone.utc)
     existing_ids = {row.id for row in db.query(PokemonForm.id).all()}
+
+    # Eliminar formas que ya no existen en el Game Master (p. ej. ids numéricos
+    # provisionales que después recibieron nombre). Los flags se borran en
+    # cascada. Protección: si la descarga viene incompleta no se borra nada.
+    stale_ids = existing_ids - {p["id"] for p in parsed}
+    deleted = 0
+    if stale_ids and len(parsed) < MIN_EXPECTED_FORMS:
+        log.warning(
+            "Game Master con solo %d formas: no se eliminan %d formas obsoletas",
+            len(parsed), len(stale_ids),
+        )
+    elif stale_ids:
+        log.info("Eliminando %d formas obsoletas: %s", len(stale_ids), sorted(stale_ids))
+        deleted = (
+            db.query(PokemonForm)
+            .filter(PokemonForm.id.in_(stale_ids))
+            .delete(synchronize_session=False)
+        )
 
     upserted = 0
     for p in parsed:
@@ -150,7 +180,7 @@ async def update_game_master(db: Session) -> dict:
         sv.last_checked_at = now
 
     db.commit()
-    return {"upserted": upserted}
+    return {"upserted": upserted, "deleted": deleted}
 
 
 async def check_remote_version(db: Session) -> None:
