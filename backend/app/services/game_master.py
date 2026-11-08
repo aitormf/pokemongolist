@@ -37,6 +37,17 @@ def _clean_type(raw: str | None) -> str | None:
     return raw.replace("POKEMON_TYPE_", "")
 
 
+def _costume_forms(entries: list[dict]) -> set[str]:
+    """Formas marcadas como disfraz (isCostume) en las entradas formSettings."""
+    costumes: set[str] = set()
+    for e in entries:
+        form_settings = e.get("data", {}).get("formSettings") or {}
+        for f in form_settings.get("forms") or []:
+            if f.get("isCostume") and f.get("form") is not None:
+                costumes.add(str(f["form"]))
+    return costumes
+
+
 def _parse_entry(entry: dict) -> dict | None:
     template_id = entry.get("templateId", "")
     m = ENTRY_PATTERN.match(template_id)
@@ -103,6 +114,9 @@ async def update_game_master(db: Session) -> dict:
 
     entries = raw if isinstance(raw, list) else raw.get("template", [])
     parsed = [p for e in entries if (p := _parse_entry(e)) is not None]
+    costumes = _costume_forms(entries)
+    for p in parsed:
+        p["is_costume"] = p["form"] in costumes
 
     log.info("Parseadas %d formas de Pokémon", len(parsed))
 

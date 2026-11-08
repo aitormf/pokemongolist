@@ -63,7 +63,7 @@ def list_pokemon(
     """
     names = get_pokemon_names(current_user.language)
 
-    query = db.query(PokemonForm)
+    query = db.query(PokemonForm).filter(PokemonForm.is_costume == False)  # noqa: E712
 
     if flag_filter and users:
         # Filtrar Pokémon donde TODOS los usuarios indicados tienen los flags indicados

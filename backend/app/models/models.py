@@ -72,6 +72,9 @@ class PokemonForm(Base):
     parent_pokemon_id: Mapped[str | None] = mapped_column(String(64))
     is_tradable: Mapped[bool] = mapped_column(Boolean, default=False)
     has_shiny: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_costume: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     stats: Mapped[dict | None] = mapped_column(JSONB)
     quick_moves: Mapped[list | None] = mapped_column(JSONB)
     cinematic_moves: Mapped[list | None] = mapped_column(JSONB)
