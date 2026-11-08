@@ -35,6 +35,12 @@ class PokemonCard extends LitElement {
     const p = this.pokemon;
     if (!p) return "";
 
+    const me = this.currentUser?.username;
+    const mine = this.flags?.[me] ?? {};
+    const others = this.users
+      .filter((u) => u.username !== me && this.flags?.[u.username]?.quiero)
+      .map((u) => u.username);
+
     return html`
       <div class="pokemon-card-item">
         <div class="pokemon-number">#${String(p.pokedex_number).padStart(4, "0")}</div>
@@ -52,38 +58,17 @@ class PokemonCard extends LitElement {
           ${p.type2 ? this._typeBadge(p.type2) : ""}
         </div>
 
-        <!-- Flags by user -->
-        ${this.users.map((u) => {
-          const isCurrentUser = u.id === this.currentUser?.id;
-          const uFlags = this.flags?.[u.username] ?? {};
-          return html`
-            <div style="width:100%;border-top:1px solid var(--color-border);padding-top:0.5rem;margin-top:0.25rem">
-              <div style="font-size:0.7rem;color:var(--color-text-muted);margin-bottom:0.25rem">${u.username}</div>
-              <div style="display:flex;gap:0.25rem;flex-wrap:wrap">
-                <flag-toggle
-                  form-id=${p.id}
-                  flag-name="quiero"
-                  ?active=${!!uFlags.quiero}
-                  ?readonly=${!isCurrentUser}
-                ></flag-toggle>
-                <flag-toggle
-                  form-id=${p.id}
-                  flag-name="tengo_100"
-                  ?active=${!!uFlags.tengo_100}
-                  ?readonly=${!isCurrentUser}
-                ></flag-toggle>
-                ${p.has_shiny ? html`
-                  <flag-toggle
-                    form-id=${p.id}
-                    flag-name="tengo_shiny"
-                    ?active=${!!uFlags.tengo_shiny}
-                    ?readonly=${!isCurrentUser}
-                  ></flag-toggle>
-                ` : ""}
-              </div>
-            </div>
-          `;
-        })}
+        <!-- Tus flags + quién más lo quiere -->
+        <div class="card-flags">
+          <flag-toggle form-id=${p.id} flag-name="quiero" ?active=${!!mine.quiero}></flag-toggle>
+          ${p.has_shiny ? html`
+            <flag-toggle form-id=${p.id} flag-name="tengo_shiny" ?active=${!!mine.tengo_shiny}></flag-toggle>
+          ` : ""}
+          <flag-toggle form-id=${p.id} flag-name="tengo_100" ?active=${!!mine.tengo_100}></flag-toggle>
+        </div>
+        ${others.length ? html`
+          <div class="card-others" title="También lo quieren">❤️ ${others.join(", ")}</div>
+        ` : ""}
       </div>
     `;
   }
