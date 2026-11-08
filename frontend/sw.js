@@ -10,7 +10,7 @@
  * del caché en todos los clientes.
  */
 
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const CACHE_NAME = `pokewish-${CACHE_VERSION}`;
 
 const APP_SHELL = [
@@ -27,6 +27,7 @@ const APP_SHELL = [
   '/js/components/pokemon-card.js',
   '/js/components/pokemon-filters.js',
   '/js/components/flag-toggle.js',
+  '/js/components/events-page.js',
   '/js/components/admin-panel.js',
   '/js/components/user-manager.js',
   '/js/components/invite-creator.js',

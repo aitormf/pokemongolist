@@ -102,6 +102,11 @@ async function route() {
     return;
   }
 
+  if (hash.startsWith("#/events")) {
+    main.innerHTML = `<events-page></events-page>`;
+    return;
+  }
+
   // Default: pokemon list
   main.innerHTML = `<pokemon-list></pokemon-list>`;
 }

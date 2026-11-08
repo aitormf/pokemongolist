@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     invite_expire_days: int = 7
     reset_token_expire_hours: int = 24
     data_dir: str = "/app/data"
+    # Cada cuántas horas se actualizan los eventos automáticamente (0 = desactivado)
+    events_refresh_hours: int = 24
 
     model_config = {"env_file": ".env"}
 

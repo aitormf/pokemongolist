@@ -674,3 +674,234 @@ tr:hover td {
     width: calc(100vw - 1.5rem);
   }
 }
+
+/* ── Eventos ─────────────────────────────────────────────────────────────── */
+.events-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.events-title {
+  font-size: 1.25rem;
+  margin-right: 0.5rem;
+}
+.events-toolbar .search-input {
+  min-width: 180px;
+}
+.events-heading {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  margin: 1.25rem 0 0.5rem;
+}
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.events-empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 2rem;
+}
+.events-attribution {
+  margin-top: 1.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+.muted {
+  color: var(--color-text-muted);
+}
+
+.event-card {
+  padding: 0;
+  overflow: hidden;
+}
+.event-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+.event-card-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+.event-image {
+  width: 120px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  flex-shrink: 0;
+}
+.event-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.event-type-badge {
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+}
+.event-name {
+  font-weight: 600;
+}
+.event-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.event-status.active {
+  color: var(--color-success);
+  font-weight: 600;
+}
+.event-status.upcoming {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+.event-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+.summary-shiny {
+  color: var(--color-shiny);
+}
+.summary-want {
+  color: #ce93d8;
+}
+.event-chevron {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.event-body {
+  border-top: 1px solid var(--color-border);
+  padding: 0.75rem 1rem 1rem;
+}
+.event-bonuses ul {
+  margin: 0 0 0.75rem 1.25rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.event-section {
+  margin-bottom: 0.75rem;
+}
+.event-section-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 0.5rem 0 0.25rem;
+}
+.event-subsection-title {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin: 0.5rem 0 0.25rem;
+}
+.event-pokemon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+.event-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.event-pkmn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  text-align: center;
+}
+.event-pkmn.missing-shiny {
+  border-color: rgba(255, 215, 0, 0.45);
+}
+.event-pkmn.wanted {
+  box-shadow: inset 0 0 0 1px var(--color-want);
+}
+.event-pkmn-img-wrap {
+  position: relative;
+}
+.event-pkmn-img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+}
+.event-pkmn-shiny {
+  position: absolute;
+  top: -2px;
+  right: -10px;
+  font-size: 0.8rem;
+}
+.event-pkmn-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.event-pkmn-variant {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+.event-pkmn-note {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  line-height: 1.2;
+}
+.event-pkmn-flags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.2rem;
+}
+.event-pkmn-flags .flag-chip {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+}
+.event-pkmn-others {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 768px) {
+  .event-card-header {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+  .event-image {
+    width: 72px;
+    height: 48px;
+  }
+  .event-pokemon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+  .events-toolbar .btn {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}

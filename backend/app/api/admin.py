@@ -11,6 +11,7 @@ from app.schemas import UserOut, InviteOut, SourceStatusOut, PasswordResetOut
 from app.services import game_master as gm_service
 from app.services import translations as tr_service
 from app.services import assets as as_service
+from app.services import events as ev_service
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -161,6 +162,7 @@ async def check_all_versions(
     await gm_service.check_remote_version(db)
     await tr_service.check_remote_version(db)
     await as_service.check_remote_version(db)
+    await ev_service.check_remote_version(db)
     return {"checked": True}
 
 
@@ -188,4 +190,13 @@ async def update_assets(
     _: User = Depends(require_admin),
 ):
     result = await as_service.update_assets(db)
+    return result
+
+
+@router.post("/sources/update/events")
+async def update_events(
+    db: Session = Depends(get_db),
+    _: User = Depends(require_admin),
+):
+    result = await ev_service.update_events(db)
     return result

@@ -44,7 +44,7 @@ def _gh_headers() -> dict:
     return headers
 
 
-def _asset_form(pokemon_id: str, form: str) -> str:
+def asset_form(pokemon_id: str, form: str) -> str:
     """
     Convierte la forma del game_master al sufijo usado en los assets.
 
@@ -62,8 +62,8 @@ def pokemon_image_url(
     """Construye la URL de imagen para un Pokémon/forma dado."""
     shiny_part = ".s" if shiny else ""
     if form:
-        asset_form = _asset_form(pokemon_id, form)
-        filename = f"pm{pokedex_number}.f{asset_form}{shiny_part}.icon.png"
+        suffix = asset_form(pokemon_id, form)
+        filename = f"pm{pokedex_number}.f{suffix}{shiny_part}.icon.png"
     else:
         filename = f"pm{pokedex_number}{shiny_part}.icon.png"
     return ASSETS_RAW_BASE + filename

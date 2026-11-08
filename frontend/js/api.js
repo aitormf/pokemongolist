@@ -73,6 +73,9 @@ export const api = {
   unsetFlag: (formId, flagName) =>
     request("DELETE", `/flags/${encodeURIComponent(formId)}/${flagName}`),
 
+  // Eventos
+  listEvents: () => request("GET", "/events"),
+
   // Admin
   listUsers: () => request("GET", "/admin/users"),
   changeRole: (userId, role) =>
@@ -89,4 +92,5 @@ export const api = {
   updateGameMaster: () => request("POST", "/admin/sources/update/game_master"),
   updateTranslations: () => request("POST", "/admin/sources/update/translations"),
   updateAssets: () => request("POST", "/admin/sources/update/assets"),
+  updateEvents: () => request("POST", "/admin/sources/update/events"),
 };

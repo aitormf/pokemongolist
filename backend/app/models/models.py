@@ -131,6 +131,63 @@ class PasswordResetToken(Base):
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
+class Event(Base):
+    """
+    Evento de Pokémon GO (fuente: LeekDuck vía ScrapedDuck).
+
+    Las fechas se guardan tal cual vienen: con "Z" final son UTC; sin ella son
+    hora local (el evento empieza a la misma hora en cada zona horaria).
+    Los ids "current-*" son pseudo-eventos con lo activo ahora mismo
+    (incursiones, huevos, investigación, Rocket).
+    """
+
+    __tablename__ = "events"
+
+    id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    name: Mapped[str] = mapped_column(Text, nullable=False)
+    event_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    heading: Mapped[str | None] = mapped_column(String(128))
+    link: Mapped[str | None] = mapped_column(Text)
+    image: Mapped[str | None] = mapped_column(Text)
+    start: Mapped[str | None] = mapped_column(String(32))
+    end: Mapped[str | None] = mapped_column(String(32))
+    is_current: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
+    bonuses: Mapped[list | None] = mapped_column(JSONB)
+    detail_fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    pokemon: Mapped[list["EventPokemon"]] = relationship(
+        "EventPokemon",
+        back_populates="event",
+        cascade="all, delete-orphan",
+        order_by="EventPokemon.position",
+    )
+
+
+class EventPokemon(Base):
+    __tablename__ = "event_pokemon"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    event_id: Mapped[str] = mapped_column(
+        String(255), ForeignKey("events.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    section: Mapped[str] = mapped_column(String(32), nullable=False)
+    subsection: Mapped[str | None] = mapped_column(Text)
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    image_url: Mapped[str | None] = mapped_column(Text)
+    can_be_shiny: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    note: Mapped[str | None] = mapped_column(Text)
+    pokedex_number: Mapped[int | None] = mapped_column(Integer)
+    pokemon_form_id: Mapped[str | None] = mapped_column(
+        String(128), ForeignKey("pokemon_forms.id", ondelete="SET NULL"), nullable=True
+    )
+
+    event: Mapped["Event"] = relationship("Event", back_populates="pokemon")
+
+
 class SourceVersion(Base):
     __tablename__ = "source_versions"
 

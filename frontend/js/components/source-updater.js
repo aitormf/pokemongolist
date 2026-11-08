@@ -6,12 +6,14 @@ const SOURCE_LABELS = {
   game_master: "Game Master",
   translations: "Traducciones",
   assets: "Assets (shiny)",
+  events: "Eventos",
 };
 
 const SOURCE_DESCRIPTIONS = {
   game_master: "Datos de Pokémon del juego (stats, movimientos, tipos)",
   translations: "Nombres de Pokémon en todos los idiomas",
   assets: "Detección de qué Pokémon tienen shiny disponible",
+  events: "Eventos y Pokémon disponibles (LeekDuck). Se actualiza solo periódicamente",
 };
 
 class SourceUpdater extends LitElement {
@@ -68,6 +70,7 @@ class SourceUpdater extends LitElement {
       if (sourceName === "game_master") result = await api.updateGameMaster();
       else if (sourceName === "translations") result = await api.updateTranslations();
       else if (sourceName === "assets") result = await api.updateAssets();
+      else if (sourceName === "events") result = await api.updateEvents();
 
       toast(`${SOURCE_LABELS[sourceName]} actualizado`);
       await this._load();

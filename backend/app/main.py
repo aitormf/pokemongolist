@@ -1,3 +1,4 @@
+import asyncio
 import os
 import logging
 from contextlib import asynccontextmanager
@@ -67,7 +68,12 @@ async def lifespan(app: FastAPI):
             time.sleep(2)
 
     _create_admin_if_needed()
+
+    from app.services.events import scheduler_loop
+
+    events_task = asyncio.create_task(scheduler_loop())
     yield
+    events_task.cancel()
 
 
 app = FastAPI(title="Pokémon GO Wishlist", lifespan=lifespan)
@@ -80,12 +86,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.api import auth, pokemon, flags, admin  # noqa: E402
+from app.api import auth, pokemon, flags, admin, events  # noqa: E402
 
 app.include_router(auth.router)
 app.include_router(pokemon.router)
 app.include_router(flags.router)
 app.include_router(admin.router)
+app.include_router(events.router)
 
 
 @app.get("/api/health")

@@ -28,6 +28,7 @@ services:
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-10080}
       INVITE_EXPIRE_DAYS: ${INVITE_EXPIRE_DAYS:-7}
       GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      EVENTS_REFRESH_HOURS: ${EVENTS_REFRESH_HOURS:-24}
     volumes:
       - backend_data:/app/data
       - ./backend/app:/app/app:ro  # hot-reload en desarrollo
