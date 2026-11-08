@@ -70,7 +70,44 @@
 <!-- Registro del Service Worker (PWA) -->
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    const CHECK_INTERVAL_MS = 10 * 60 * 1000;
+    const hadController = !!navigator.serviceWorker.controller;
+
+    function showUpdateBanner() {
+      if (document.getElementById('update-banner')) return;
+      const banner = document.createElement('div');
+      banner.id = 'update-banner';
+      banner.className = 'update-banner';
+      banner.innerHTML =
+        '<span>Hay una versión nueva</span>' +
+        '<button class="btn btn-primary" type="button">Recargar</button>' +
+        '<button class="btn btn-ghost update-banner-close" type="button" aria-label="Cerrar">✕</button>';
+      banner.querySelector('.btn-primary').addEventListener('click', () => location.reload());
+      banner.querySelector('.update-banner-close').addEventListener('click', () => banner.remove());
+      document.body.appendChild(banner);
+    }
+
+    // El SW avisa cuando detecta ficheros distintos de los que usa la página
+    navigator.serviceWorker.addEventListener('message', (e) => {
+      if (e.data?.type === 'update-available') showUpdateBanner();
+    });
+    // Un SW nuevo ha tomado el control (no en la primera instalación)
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (hadController) showUpdateBanner();
+    });
+
+    navigator.serviceWorker.register('/sw.js').then((reg) => {
+      // La página acaba de cargarse desde la red: la primera comprobación
+      // se hace al volver a primer plano pasado el intervalo
+      let lastCheck = Date.now();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState !== 'visible') return;
+        if (Date.now() - lastCheck < CHECK_INTERVAL_MS) return;
+        lastCheck = Date.now();
+        reg.update().catch(() => {});
+        navigator.serviceWorker.controller?.postMessage({ type: 'check-updates' });
+      });
+    }).catch((err) => {
       console.warn('Service Worker no registrado:', err);
     });
   }
