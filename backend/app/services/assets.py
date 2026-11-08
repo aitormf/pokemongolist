@@ -1,9 +1,13 @@
 """
 Detección de disponibilidad de shiny en Pokémon GO.
 
-Fuente: https://github.com/pokemon-go-api/assets
+Fuente: https://github.com/PokeMiners/pogo_assets
+        (carpeta "Images/Pokemon - 256x256/Addressable Assets")
 Convención de nombres: pm{N}.f{FORM}.s.icon.png  (shiny con forma)
                        pm{N}.s.icon.png            (shiny sin forma / base)
+
+Nota: que exista la imagen shiny no garantiza que el shiny esté liberado en el
+juego (los assets son datamineados y pueden adelantarse a su lanzamiento).
 
 En lugar de descargar la lista completa de ficheros del repo, hacemos una
 petición HEAD por cada forma de Pokémon. Si devuelve 200 → has_shiny = True.
@@ -13,6 +17,7 @@ import asyncio
 import logging
 import os
 from datetime import datetime, timezone
+from urllib.parse import quote
 
 import httpx
 from sqlalchemy.orm import Session
@@ -21,8 +26,12 @@ from app.models import PokemonForm, SourceVersion
 
 log = logging.getLogger(__name__)
 
+ASSETS_REPO = "PokeMiners/pogo_assets"
+ASSETS_BRANCH = "master"
+ASSETS_PATH = "Images/Pokemon - 256x256/Addressable Assets"
 ASSETS_RAW_BASE = (
-    "https://raw.githubusercontent.com/pokemon-go-api/assets/main/Pokemon/"
+    f"https://raw.githubusercontent.com/{ASSETS_REPO}/{ASSETS_BRANCH}/"
+    f"{quote(ASSETS_PATH)}/"
 )
 CONCURRENCY = 20  # peticiones HEAD paralelas
 
@@ -35,14 +44,25 @@ def _gh_headers() -> dict:
     return headers
 
 
-def pokemon_image_url(pokedex_number: int, form: str | None, shiny: bool = False) -> str:
+def _asset_form(pokemon_id: str, form: str) -> str:
+    """
+    Convierte la forma del game_master al sufijo usado en los assets.
+
+    "NINETALES_ALOLA" (pokemon_id "NINETALES") → "ALOLA"
+    "MR_MIME_GALARIAN" (pokemon_id "MR_MIME")  → "GALARIAN"
+    Si la forma no empieza por el pokemon_id, se usa completa.
+    """
+    prefix = f"{pokemon_id}_"
+    return form[len(prefix):] if form.startswith(prefix) else form
+
+
+def pokemon_image_url(
+    pokedex_number: int, pokemon_id: str, form: str | None, shiny: bool = False
+) -> str:
     """Construye la URL de imagen para un Pokémon/forma dado."""
     shiny_part = ".s" if shiny else ""
     if form:
-        # La forma en el game_master es tipo "NINETALES_ALOLA".
-        # En los assets es solo "ALOLA". Extraemos la parte tras el primer "_".
-        parts = form.split("_", 1)
-        asset_form = parts[1] if len(parts) > 1 else parts[0]
+        asset_form = _asset_form(pokemon_id, form)
         filename = f"pm{pokedex_number}.f{asset_form}{shiny_part}.icon.png"
     else:
         filename = f"pm{pokedex_number}{shiny_part}.icon.png"
@@ -53,8 +73,8 @@ async def fetch_remote_version() -> str | None:
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             r = await client.get(
-                "https://api.github.com/repos/pokemon-go-api/assets/commits"
-                "?path=Pokemon&per_page=1",
+                f"https://api.github.com/repos/{ASSETS_REPO}/commits",
+                params={"sha": ASSETS_BRANCH, "path": ASSETS_PATH, "per_page": 1},
                 headers=_gh_headers(),
             )
             r.raise_for_status()
@@ -88,7 +108,13 @@ async def update_assets(db: Session) -> dict:
     sem = asyncio.Semaphore(CONCURRENCY)
     async with httpx.AsyncClient(timeout=15) as client:
         tasks = [
-            _has_shiny(client, sem, pokemon_image_url(pf.pokedex_number, pf.form, shiny=True))
+            _has_shiny(
+                client,
+                sem,
+                pokemon_image_url(
+                    pf.pokedex_number, pf.pokemon_id, pf.form, shiny=True
+                ),
+            )
             for pf in all_forms
         ]
         results = await asyncio.gather(*tasks)

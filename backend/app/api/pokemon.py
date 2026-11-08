@@ -31,9 +31,11 @@ def _enrich(pf: PokemonForm, names: dict[str, str]) -> dict:
         "quick_moves": pf.quick_moves,
         "cinematic_moves": pf.cinematic_moves,
         "elite_cinematic_move": pf.elite_cinematic_move,
-        "image_url": pokemon_image_url(pf.pokedex_number, pf.form, shiny=False),
+        "image_url": pokemon_image_url(
+            pf.pokedex_number, pf.pokemon_id, pf.form, shiny=False
+        ),
         "image_shiny_url": (
-            pokemon_image_url(pf.pokedex_number, pf.form, shiny=True)
+            pokemon_image_url(pf.pokedex_number, pf.pokemon_id, pf.form, shiny=True)
             if pf.has_shiny
             else None
         ),

@@ -31,7 +31,7 @@ Web app para que un grupo de amigos pueda coordinar qué Pokémon quieren interc
 |--------|-------------|-----------|
 | Game Master | [alexelgt/game_masters](https://github.com/alexelgt/game_masters) | Stats, tipos, movimientos de cada Pokémon |
 | Traducciones | [sora10pls/holoholo-text](https://github.com/sora10pls/holoholo-text) | Nombres en 15 idiomas |
-| Assets | [pokemon-go-api/assets](https://github.com/pokemon-go-api/assets) | Detección de shinies disponibles + imágenes |
+| Assets | [PokeMiners/pogo_assets](https://github.com/PokeMiners/pogo_assets) (`Images/Pokemon - 256x256`) | Detección de shinies disponibles + imágenes |
 
 Las imágenes se sirven directamente desde GitHub (no se descargan al servidor). El admin puede actualizar cada fuente de forma independiente desde el panel de administración.
 
