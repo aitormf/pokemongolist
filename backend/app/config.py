@@ -8,8 +8,9 @@ class Settings(BaseSettings):
     invite_expire_days: int = 7
     reset_token_expire_hours: int = 24
     data_dir: str = "/app/data"
-    # Cada cuántas horas se actualizan los eventos automáticamente (0 = desactivado)
+    # Actualizaciones automáticas, en horas (0 = desactivada)
     events_refresh_hours: int = 24
+    data_refresh_hours: int = 24 * 7  # Game Master y assets: semanal
 
     model_config = {"env_file": ".env"}
 

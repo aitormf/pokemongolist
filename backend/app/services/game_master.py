@@ -113,7 +113,9 @@ async def fetch_remote_version() -> str | None:
             r = await client.get(TIMESTAMP_URL)
             r.raise_for_status()
             data = r.json()
-            return str(data.get("timestamp", ""))
+            # timestamp.json: {"batchId": "...", "uploadTime": "..."}
+            version = data.get("batchId") or data.get("uploadTime") or data.get("timestamp")
+            return str(version) if version else None
     except Exception as e:
         log.warning("No se pudo obtener versión remota de game_master: %s", e)
         return None

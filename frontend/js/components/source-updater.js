@@ -10,10 +10,10 @@ const SOURCE_LABELS = {
 };
 
 const SOURCE_DESCRIPTIONS = {
-  game_master: "Datos de Pokémon del juego (stats, movimientos, tipos)",
+  game_master: "Datos de Pokémon del juego (stats, movimientos, tipos). Se comprueba cada semana",
   translations: "Nombres de Pokémon en todos los idiomas",
-  assets: "Detección de qué Pokémon tienen shiny disponible",
-  events: "Eventos y Pokémon disponibles (LeekDuck). Se actualiza solo periódicamente",
+  assets: "Detección de qué Pokémon tienen shiny disponible. Se comprueba cada semana",
+  events: "Eventos y Pokémon disponibles (LeekDuck). Se actualiza cada día",
 };
 
 class SourceUpdater extends LitElement {

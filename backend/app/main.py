@@ -69,11 +69,11 @@ async def lifespan(app: FastAPI):
 
     _create_admin_if_needed()
 
-    from app.services.events import scheduler_loop
+    from app.services.scheduler import scheduler_loop
 
-    events_task = asyncio.create_task(scheduler_loop())
+    scheduler_task = asyncio.create_task(scheduler_loop())
     yield
-    events_task.cancel()
+    scheduler_task.cancel()
 
 
 app = FastAPI(title="Pokémon GO Wishlist", lifespan=lifespan)

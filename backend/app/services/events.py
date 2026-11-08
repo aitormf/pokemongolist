@@ -25,8 +25,6 @@ import httpx
 from bs4 import BeautifulSoup, Tag
 from sqlalchemy.orm import Session
 
-from app.config import settings
-from app.db import SessionLocal
 from app.models import Event, EventPokemon, PokemonForm, SourceVersion
 from app.services.assets import asset_form
 
@@ -525,32 +523,3 @@ async def check_remote_version(db: Session) -> None:
         sv.remote_version = remote_v
         sv.last_checked_at = datetime.now(timezone.utc)
         db.commit()
-
-
-# ── Actualización automática ──────────────────────────────────────────────────
-
-async def scheduler_loop() -> None:
-    """
-    Actualiza los eventos cada EVENTS_REFRESH_HOURS horas (0 = desactivado).
-    Comprueba cada hora si toca, así un reinicio no retrasa la actualización.
-    """
-    interval_h = settings.events_refresh_hours
-    if interval_h <= 0:
-        log.info("Actualización automática de eventos desactivada")
-        return
-    interval = timedelta(hours=interval_h)
-    log.info("Actualización automática de eventos cada %d h", interval_h)
-
-    await asyncio.sleep(30)  # dejar arrancar la app
-    while True:
-        try:
-            with SessionLocal() as db:
-                sv = db.get(SourceVersion, "events")
-                last = sv.last_updated_at if sv else None
-                if last is None or datetime.now(timezone.utc) - last >= interval:
-                    await update_events(db)
-        except asyncio.CancelledError:
-            raise
-        except Exception:
-            log.exception("Error en la actualización automática de eventos")
-        await asyncio.sleep(min(interval.total_seconds(), 3600))
