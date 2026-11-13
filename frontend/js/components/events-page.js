@@ -74,6 +74,8 @@ class EventsPage extends LitElement {
     _onlyShiny: { type: Boolean, state: true },
     _onlyWant:  { type: Boolean, state: true },
     _search:    { type: String,  state: true },
+    _exportEvent: { type: Object, state: true },
+    _exportUsers: { type: Array,  state: true },
   };
 
   createRenderRoot() { return this; }
@@ -89,18 +91,26 @@ class EventsPage extends LitElement {
     this._onlyShiny = false;
     this._onlyWant = false;
     this._search = "";
+    this._exportEvent = null;
+    this._exportUsers = [];
   }
 
   async connectedCallback() {
     super.connectedCallback();
     this.addEventListener("flag-changed", this._onFlagChanged);
+    document.addEventListener("keydown", this._onKeydown);
     await this._load();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener("flag-changed", this._onFlagChanged);
+    document.removeEventListener("keydown", this._onKeydown);
   }
+
+  _onKeydown = (e) => {
+    if (e.key === "Escape" && this._exportEvent) this._closeExport();
+  };
 
   async _load() {
     this._loading = true;
@@ -176,6 +186,79 @@ class EventsPage extends LitElement {
     return { total: ids.size, missing: missing.size, want: want.size };
   }
 
+  // ── Exportar ───────────────────────────────────────────────────────────────
+
+  _openExport(ev) {
+    this._exportEvent = ev;
+    const me = this._users.find((u) => u.username === store.user?.username);
+    this._exportUsers = me ? [me.username] : [];
+  }
+
+  _closeExport() {
+    this._exportEvent = null;
+  }
+
+  _toggleExportUser(username) {
+    this._exportUsers = this._exportUsers.includes(username)
+      ? this._exportUsers.filter((u) => u !== username)
+      : [...this._exportUsers, username];
+  }
+
+  /** Números de Pokédex (sin repetir) del evento que quiere alguno de los usuarios elegidos. */
+  _exportNumbers(ev, usernames) {
+    const seen = new Set();
+    for (const p of ev.pokemon) {
+      if (!p.form_id || p.pokedex_number == null) continue;
+      const byUser = this._flags?.[p.form_id] ?? {};
+      if (usernames.some((u) => byUser[u]?.quiero)) seen.add(p.pokedex_number);
+    }
+    return [...seen];
+  }
+
+  async _copyExport() {
+    const nums = this._exportNumbers(this._exportEvent, this._exportUsers);
+    if (!nums.length) return;
+    try {
+      await navigator.clipboard.writeText(nums.join(","));
+      toast("Filtro copiado al portapapeles", "success");
+      this._closeExport();
+    } catch {
+      toast("No se pudo acceder al portapapeles", "error");
+    }
+  }
+
+  _exportDialog() {
+    const ev = this._exportEvent;
+    if (!ev) return "";
+    const count = this._exportNumbers(ev, this._exportUsers).length;
+
+    return html`
+      <div class="modal-backdrop" @click=${this._closeExport}>
+        <div class="card modal" role="dialog" aria-modal="true" @click=${(e) => e.stopPropagation()}>
+          <div class="modal-title">Exportar · ${ev.name}</div>
+          <p class="modal-hint">Pokémon del evento que quiere alguno de estos usuarios:</p>
+          <div class="modal-users">
+            ${this._users.map((u) => html`
+              <label class="user-checkbox">
+                <input
+                  type="checkbox"
+                  .checked=${this._exportUsers.includes(u.username)}
+                  @change=${() => this._toggleExportUser(u.username)}
+                />
+                ${u.username}
+              </label>
+            `)}
+          </div>
+          <div class="modal-actions">
+            <span class="muted">${count} Pokémon</span>
+            <button class="btn btn-ghost" @click=${this._closeExport}>Cancelar</button>
+            <button class="btn btn-primary" ?disabled=${!count} @click=${this._copyExport}>Copiar</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   _isActiveEvent(ev) {
     const end = parseDate(ev.end);
     return !end || end > new Date();
@@ -237,6 +320,8 @@ class EventsPage extends LitElement {
         Datos de <a href="https://leekduck.com/events/" target="_blank" rel="noopener">LeekDuck</a>
         vía <a href="https://github.com/bigfoott/ScrapedDuck" target="_blank" rel="noopener">ScrapedDuck</a>.
       </p>
+
+      ${this._exportDialog()}
     `;
   }
 
@@ -266,6 +351,13 @@ class EventsPage extends LitElement {
               ${s.want ? html`<span class="summary-want">❤️ ${s.want} que quieres</span>` : ""}
             </div>
           </div>
+          ${ev.pokemon.some((p) => p.form_id) ? html`
+            <button
+              class="btn btn-ghost export-btn event-export-btn"
+              title="Exportar los Pokémon que quieren los usuarios elegidos"
+              @click=${(e) => { e.stopPropagation(); this._openExport(ev); }}
+            >Exportar</button>
+          ` : ""}
           <span class="event-chevron">${expanded ? "▾" : "▸"}</span>
         </div>
 

@@ -951,3 +951,47 @@ tr:hover td {
 .update-banner .update-banner-close {
   padding: 0.35rem 0.6rem;
 }
+
+/* ── Modal de exportación de eventos ─────────────────────────────────────── */
+.event-export-btn {
+  flex-shrink: 0;
+}
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.6);
+}
+.modal {
+  width: 100%;
+  max-width: 380px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+.modal-title {
+  font-weight: 600;
+}
+.modal-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+.modal-users {
+  overflow-y: auto;
+}
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+.modal-actions .muted {
+  margin-right: auto;
+  font-size: 0.8rem;
+}
